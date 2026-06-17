@@ -1,9 +1,9 @@
-#define BLYNK_TEMPLATE_ID "TMPL2o-qm6hNn"
-#define BLYNK_TEMPLATE_NAME "Medidor de nivel y consumo de agua"
+#define BLYNK_TEMPLATE_ID "YOUR_TEMPLATE_ID"
+#define BLYNK_TEMPLATE_NAME "YOUR_TEMPLATE_NAME"
 #define BLYNK_FIRMWARE_VERSION "0.6.4"
 
 #define BLYNK_PRINT Serial
-//#define BLYNK_DEBUG
+// #define BLYNK_DEBUG
 #define APP_DEBUG
 
 #include "BlynkEdgent.h"
@@ -37,8 +37,8 @@ double Vs = 5.00;
 double slope_air = 25.697;
 double slope_h2o = 25.69635;
 double tol = 0.02;
-double slope = 1; //1.0106;
-double intercept = 0; //0.0841;
+double slope = 1;     // 1.0106;
+double intercept = 0; // 0.0841;
 const float c = 0.982;
 const float b = 0.126;
 
@@ -56,7 +56,8 @@ volatile float litros_totales = 0;
 unsigned long currentTime;
 unsigned long cloopTime;
 
-void IRAM_ATTR contarPulsos(){
+void IRAM_ATTR contarPulsos()
+{
   pulsos++;
 }
 
@@ -68,7 +69,8 @@ LiquidCrystal_I2C lcd(0x3f, 20, 4);
 BlynkTimer timer;
 
 // --- Funciones Blynk ---
-void myTimer() {
+void myTimer()
+{
   Blynk.virtualWrite(V0, Level);
   Blynk.virtualWrite(V1, porcentaje);
   Blynk.virtualWrite(V5, l_min);
@@ -84,21 +86,25 @@ BLYNK_WRITE(V7) { tol = param.asDouble(); }
 BLYNK_WRITE(V8) { cte = param.asDouble(); }
 
 // --- Interrupción flujo ---
-void flow() {
+void flow()
+{
   flow_frequency++;
   flow_frequency_2++;
 }
 
 // --- Task de medición y LCD (núcleo 1) ---
-void TaskMedicion(void *pvParameters) {
+void TaskMedicion(void *pvParameters)
+{
   double aux1, aux2;
   const int n = 200;
 
-  for (;;) {
+  for (;;)
+  {
     // --- Lectura sensores ---
     aux1 = 0;
     aux2 = 0;
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
       aux1 += analogRead(aire) * 3.3 / 4095.0;
       aux2 += analogRead(agua) * 3.3 / 4095.0;
       vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -115,18 +121,20 @@ void TaskMedicion(void *pvParameters) {
     // --- Cálculo nivel ---
     Level = slope * ((slope_h2o * Vh2o - slope_air * Vair) / Vs + tol) + intercept;
     Level = round(Level * 100.0) / 100.0;
-    if (Level < 0) Level = 0;
+    if (Level < 0)
+      Level = 0;
     porcentaje = Level * 100 / total;
 
     // --- Cálculo flujo cada segundo ---
-     //Medición de flujo
-   currentTime = millis();
-   // Every second, calculate and print litres/min
-   if(currentTime >= (cloopTime + 1000)){
+    // Medición de flujo
+    currentTime = millis();
+    // Every second, calculate and print litres/min
+    if (currentTime >= (cloopTime + 1000))
+    {
       cloopTime = currentTime; // Updates cloopTime
 
       // Pulse frequency (Hz) = 7.5Q, Q is flow rate in L/min.
-      l_min = (flow_frequency  / cte);
+      l_min = (flow_frequency / cte);
       // (Pulse frequency x 60 min) / 7.5Q = flowrate in L/hour
 
       flow_frequency = 0; // Reset Counter
@@ -134,28 +142,43 @@ void TaskMedicion(void *pvParameters) {
     }
 
     // --- Actualización LCD ---
-    if (digitalRead(boton) == 1) modo = !modo;
+    if (digitalRead(boton) == 1)
+      modo = !modo;
 
     lcd.clear();
     lcd.setCursor(0, 0);
-    if (modo == 0) {
+    if (modo == 0)
+    {
       lcd.print("Capacidad: ");
-      lcd.setCursor(12, 0); lcd.print(porcentaje);
-      lcd.setCursor(15, 0); lcd.print("%");
-      lcd.setCursor(0, 1);  lcd.print("Nivel: ");
-      lcd.setCursor(10, 1); lcd.print(Level, 2);
-      lcd.setCursor(15, 1); lcd.print("m");
-    } else {
-      lcd.print(l_min, 2); lcd.print(" L/min");
-      lcd.setCursor(0, 1); lcd.print(Liters, 2); lcd.print(" L");
-      lcd.setCursor(12, 1); lcd.print(porcentaje);
-      lcd.setCursor(15, 1); lcd.print("%");
+      lcd.setCursor(12, 0);
+      lcd.print(porcentaje);
+      lcd.setCursor(15, 0);
+      lcd.print("%");
+      lcd.setCursor(0, 1);
+      lcd.print("Nivel: ");
+      lcd.setCursor(10, 1);
+      lcd.print(Level, 2);
+      lcd.setCursor(15, 1);
+      lcd.print("m");
+    }
+    else
+    {
+      lcd.print(l_min, 2);
+      lcd.print(" L/min");
+      lcd.setCursor(0, 1);
+      lcd.print(Liters, 2);
+      lcd.print(" L");
+      lcd.setCursor(12, 1);
+      lcd.print(porcentaje);
+      lcd.setCursor(15, 1);
+      lcd.print("%");
     }
   }
 }
 
 // --- Setup ---
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   // Pines
@@ -173,34 +196,40 @@ void setup() {
   lcd.init();
   lcd.backlight();
   lcd.clear();
-  lcd.setCursor(0, 0); lcd.print("Iniciando...");
+  lcd.setCursor(0, 0);
+  lcd.print("Iniciando...");
 
   // Blynk
   BlynkEdgent.begin();
 
   // Task de medición + LCD en núcleo 1
   xTaskCreatePinnedToCore(
-    TaskMedicion, "MedicionLCD", 4096, NULL, 1, NULL, 1
-  );
+      TaskMedicion, "MedicionLCD", 4096, NULL, 1, NULL, 1);
 
   // Timers para Blynk
   timer.setInterval(1000L, myTimer);
 
   lcd.clear();
-  lcd.setCursor(0, 0); lcd.print("Sistema listo");
+  lcd.setCursor(0, 0);
+  lcd.print("Sistema listo");
 }
 
 // --- Blynk conectado ---
-BLYNK_CONNECTED() {
+BLYNK_CONNECTED()
+{
   lcd.clear();
-  lcd.setCursor(0, 0); lcd.print("Conectado con");
-  lcd.setCursor(0, 1); lcd.print("exito!");
+  lcd.setCursor(0, 0);
+  lcd.print("Conectado con");
+  lcd.setCursor(0, 1);
+  lcd.print("exito!");
   delay(2000);
 }
 
 // --- Loop principal (núcleo 0) ---
-void loop() {
-  if(WiFi.status() != WL_CONNECTED) {
+void loop()
+{
+  if (WiFi.status() != WL_CONNECTED)
+  {
     BlynkEdgent.run();
   }
 

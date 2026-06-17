@@ -1,9 +1,9 @@
-#define BLYNK_TEMPLATE_ID "TMPL2o-qm6hNn"      // Actualiza con tu template real
-#define BLYNK_TEMPLATE_NAME "Medidor de nivel y consumo de agua"
+#define BLYNK_TEMPLATE_ID "YOUR_TEMPLATE_ID"
+#define BLYNK_TEMPLATE_NAME "YOUR_TEMPLATE_NAME"
 #define BLYNK_FIRMWARE_VERSION "0.6.1"
 
 #define BLYNK_PRINT Serial
-//#define BLYNK_DEBUG
+// #define BLYNK_DEBUG
 #define APP_DEBUG
 
 #include "BlynkEdgent.h"
@@ -64,7 +64,8 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 BlynkTimer timer;
 
 // --- Funciones ---
-void myTimer() {
+void myTimer()
+{
   Blynk.virtualWrite(V0, Level);
   Blynk.virtualWrite(V1, porcentaje);
   Blynk.virtualWrite(V5, l_min);
@@ -73,10 +74,12 @@ void myTimer() {
   Blynk.virtualWrite(V12, Vh2o);
 }
 
-void Medicion() {
+void Medicion()
+{
   aux1 = 0;
   aux2 = 0;
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++)
+  {
     aux1 += analogRead(aire) * 3.3 / 4095.0;
     aux2 += analogRead(agua) * 3.3 / 4095.0;
     vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -85,18 +88,22 @@ void Medicion() {
   Vh2o = aux2 / n;
   Vout = Vh2o - Vair;
 
-  Level = slope * ((slope_h2o * Vh2o - slope_air * Vair)/Vs + tol) + intercept;
-  if (Level < 0) Level = 0;
+  Level = slope * ((slope_h2o * Vh2o - slope_air * Vair) / Vs + tol) + intercept;
+  if (Level < 0)
+    Level = 0;
   porcentaje = Level * 100 / total;
 }
 
-void Pantalla() {
-  if (digitalRead(boton) == 1) modo = !modo;
+void Pantalla()
+{
+  if (digitalRead(boton) == 1)
+    modo = !modo;
 
   lcd.clear();
   lcd.setCursor(0, 0);
 
-  if (modo == 0) {
+  if (modo == 0)
+  {
     lcd.print("Depth: ");
     lcd.setCursor(10, 0);
     lcd.print(Level);
@@ -108,7 +115,9 @@ void Pantalla() {
     lcd.print(porcentaje);
     lcd.setCursor(15, 1);
     lcd.print("%");
-  } else {
+  }
+  else
+  {
     lcd.print(l_min);
     lcd.print(" L/min");
     lcd.setCursor(0, 1);
@@ -130,13 +139,15 @@ BLYNK_WRITE(V9) { lon = param.asDouble(); }
 BLYNK_WRITE(V10) { lat = param.asDouble(); }
 
 // --- Interrupt ---
-void flow() {
+void flow()
+{
   flow_frequency++;
   flow_frequency_2++;
 }
 
 // --- Setup ---
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   // Pines
@@ -151,7 +162,8 @@ void setup() {
   lcd.init();
   lcd.backlight();
   lcd.clear();
-  lcd.setCursor(0, 0); lcd.print("Iniciando...");
+  lcd.setCursor(0, 0);
+  lcd.print("Iniciando...");
 
   // Blynk
   BlynkEdgent.begin();
@@ -166,7 +178,8 @@ void setup() {
 }
 
 // --- Blynk conectado ---
-BLYNK_CONNECTED() {
+BLYNK_CONNECTED()
+{
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Conectado con");
@@ -176,15 +189,18 @@ BLYNK_CONNECTED() {
 }
 
 // --- Loop ---
-void loop() {
+void loop()
+{
   // Ejecuta BlynkEdgent solo si el WiFi está activo o intenta reconectar
-  if(WiFi.status() != WL_CONNECTED) {
+  if (WiFi.status() != WL_CONNECTED)
+  {
     BlynkEdgent.run();
   }
 
   // Flujo
   currentTime = millis();
-  if(currentTime >= cloopTime + 1000){
+  if (currentTime >= cloopTime + 1000)
+  {
     cloopTime = currentTime;
     l_min = flow_frequency / cte;
     Liters = flow_frequency_2 * cte / 3600.0;
@@ -195,4 +211,3 @@ void loop() {
   BlynkEdgent.run();
   timer.run();
 }
-

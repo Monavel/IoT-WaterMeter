@@ -1,11 +1,11 @@
 // Fill-in information from your Blynk Template here
-#define BLYNK_TEMPLATE_ID "TMPLaEzS0d_s"
-#define BLYNK_DEVICE_NAME "Medidor de profundidad"  
+#define BLYNK_TEMPLATE_ID "YOUR_TEMPLATE_ID"
+#define BLYNK_TEMPLATE_NAME "YOUR_TEMPLATE_NAME"
 
-#define BLYNK_FIRMWARE_VERSION        "0.2.2"
+#define BLYNK_FIRMWARE_VERSION "0.2.2"
 
 #define BLYNK_PRINT Serial
-//#define BLYNK_DEBUG
+// #define BLYNK_DEBUG
 
 #define APP_DEBUG
 
@@ -15,24 +15,24 @@
 #define aire 34
 #define agua 35
 #define boton 25
-#define flowsensor  27
+#define flowsensor 27
 
 // Uncomment your board, or configure a custom board in Settings.h
-//#define USE_WROVER_BOARD
-//#define USE_TTGO_T7
-//#define USE_ESP32C3_DEV_MODULE
-//#define USE_ESP32S2_DEV_KIT
+// #define USE_WROVER_BOARD
+// #define USE_TTGO_T7
+// #define USE_ESP32C3_DEV_MODULE
+// #define USE_ESP32S2_DEV_KIT
 
 #include "BlynkEdgent.h"
 // Declaring a global variable for sensor data
-double Level,Vair, Vh2o,P,Vs, Vout, lon = -98.77083, lat = 20.0625;
+double Level, Vair, Vh2o, P, Vs, Vout, lon = -98.77083, lat = 20.0625;
 double aux1, aux2, slope_air = 25.697, slope_h2o = 25.69635;
-double tol=-0.030; // Ajusta la medida de presión
-int i, rho = 997, n=200, porcentaje, indice=0;
-double g=9.8, total;
-bool modo=0;
+double tol = -0.030; // Ajusta la medida de presión
+int i, rho = 997, n = 200, porcentaje, indice = 0;
+double g = 9.8, total;
+bool modo = 0;
 
-volatile int flow_frequency; // Measures flow sensor pulses
+volatile int flow_frequency;   // Measures flow sensor pulses
 volatile int flow_frequency_2; // Measures flow sensor pulses
 float l_hour;
 unsigned long currentTime;
@@ -43,12 +43,12 @@ WidgetMap myMap(V5);
 
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
 
-//Hasta aquí lo de la pantalla
+// Hasta aquí lo de la pantalla
 
-// This function creates the timer object. It's part of Blynk library 
-BlynkTimer timer; 
+// This function creates the timer object. It's part of Blynk library
+BlynkTimer timer;
 
-void myTimer() 
+void myTimer()
 {
   // This function describes what will happen with each timer tick
   // e.g. writing sensor value to datastream V0
@@ -56,7 +56,7 @@ void myTimer()
   Blynk.virtualWrite(V1, porcentaje);
   Blynk.virtualWrite(V2, lon, lat);
   Blynk.virtualWrite(V5, l_hour);
-  Blynk.virtualWrite(V6, Liters); 
+  Blynk.virtualWrite(V6, Liters);
 }
 
 BLYNK_WRITE(V3) // this command is listening when something is written to V3
@@ -91,8 +91,8 @@ BLYNK_WRITE(V10) // this command is listening when something is written to V10
 
 void flow() // Interrupt function
 {
-flow_frequency++;
-flow_frequency_2++;
+  flow_frequency++;
+  flow_frequency_2++;
 }
 
 void setup()
@@ -110,110 +110,115 @@ void setup()
 
   // initialize LCD
   lcd.init();
-  // turn on LCD backlight                      
+  // turn on LCD backlight
   lcd.backlight();
 
   BlynkEdgent.begin();
 
   myMap.location(indice, lat, lon, "Cisterna");
 
-  // Setting interval to send data to Blynk Cloud to 1000ms. 
+  // Setting interval to send data to Blynk Cloud to 1000ms.
   // It means that data will be sent every second
   timer.setInterval(1000L, myTimer);
-  delay(100); 
+  delay(100);
 }
 
-void loop() {
-   BlynkEdgent.run();
-   digitalWrite(rst, LOW);
+void loop()
+{
+  BlynkEdgent.run();
+  digitalWrite(rst, LOW);
 
-   //Medición de flujo
-   currentTime = millis();
-   // Every second, calculate and print litres/hour
-   if(currentTime >= (cloopTime + 1000)){
-   cloopTime = currentTime; // Updates cloopTime
+  // Medición de flujo
+  currentTime = millis();
+  // Every second, calculate and print litres/hour
+  if (currentTime >= (cloopTime + 1000))
+  {
+    cloopTime = currentTime; // Updates cloopTime
 
-   // Pulse frequency (Hz) = 7.5Q, Q is flow rate in L/min.
-   l_hour = (flow_frequency  / cte);
-   // (Pulse frequency x 60 min) / 7.5Q = flowrate in L/hour
+    // Pulse frequency (Hz) = 7.5Q, Q is flow rate in L/min.
+    l_hour = (flow_frequency / cte);
+    // (Pulse frequency x 60 min) / 7.5Q = flowrate in L/hour
 
-   flow_frequency = 0; // Reset Counter
-   Liters = flow_frequency_2*cte/3600;
-   }
-   
-   //Medición de profundidad
-   aux1=0;
-   aux2=0;
-   //aux3=0;
-   for(i=0;i<n;i++){
-    aux1 = aux1 + (float(analogRead(aire))*3.3/4095.0); //v
-    aux2 = aux2 + (float(analogRead(agua))*3.3/4095.0); //v
-    //aux3 = aux3 + (float(analogRead(14))*3.3/4095.0); //v
-    delay(10);
-   }
-   Vair = aux1/n;
-   Vh2o = aux2/n;
-   //Vs = aux3/n;
-   Vout = Vh2o - Vair;
-  
-  //Presión en Kpa según gráfica 4 del Datasheet
-  //P = ( Vout + 0.04*Vs ) / (0.004 * Vs) + tolP; //kPa
- 
-  //Level = ((P*1000)/(rho*g));  //Medida de Nivel del tanque
-  //Level = 1.081349*Level + 0.219574;
-
-  Level = (slope_h2o * Vh2o - slope_air * Vair)/Vs + tol;
-
-  if (Level<0){
-    Level = 0; 
-  };
-
-  porcentaje = Level * 100/total;
-
-  //Serial.print("Presión:");
-  //Serial.print(P);
-  //Serial.print("Vh20: ");
-  //Serial.println(Vh2o);
-  //Serial.print("Vair: ");
-  //Serial.println(Vair);
-
-  //Aquí se decide qué se va a mostrar en la pantalla
-  if (digitalRead(boton) == 1){
-    modo = !modo; 
+    flow_frequency = 0; // Reset Counter
+    Liters = flow_frequency_2 * cte / 3600;
   }
 
-  if (modo == 0){
+  // Medición de profundidad
+  aux1 = 0;
+  aux2 = 0;
+  // aux3=0;
+  for (i = 0; i < n; i++)
+  {
+    aux1 = aux1 + (float(analogRead(aire)) * 3.3 / 4095.0); // v
+    aux2 = aux2 + (float(analogRead(agua)) * 3.3 / 4095.0); // v
+    // aux3 = aux3 + (float(analogRead(14))*3.3/4095.0); //v
+    delay(10);
+  }
+  Vair = aux1 / n;
+  Vh2o = aux2 / n;
+  // Vs = aux3/n;
+  Vout = Vh2o - Vair;
+
+  // Presión en Kpa según gráfica 4 del Datasheet
+  // P = ( Vout + 0.04*Vs ) / (0.004 * Vs) + tolP; //kPa
+
+  // Level = ((P*1000)/(rho*g));  //Medida de Nivel del tanque
+  // Level = 1.081349*Level + 0.219574;
+
+  Level = (slope_h2o * Vh2o - slope_air * Vair) / Vs + tol;
+
+  if (Level < 0)
+  {
+    Level = 0;
+  };
+
+  porcentaje = Level * 100 / total;
+
+  // Serial.print("Presión:");
+  // Serial.print(P);
+  // Serial.print("Vh20: ");
+  // Serial.println(Vh2o);
+  // Serial.print("Vair: ");
+  // Serial.println(Vair);
+
+  // Aquí se decide qué se va a mostrar en la pantalla
+  if (digitalRead(boton) == 1)
+  {
+    modo = !modo;
+  }
+
+  if (modo == 0)
+  {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Profundidad");
-    lcd.setCursor(0,1);
+    lcd.setCursor(0, 1);
     lcd.print(Level);
-    lcd.setCursor(6,1);
+    lcd.setCursor(6, 1);
     lcd.print("m");
-    lcd.setCursor(12,1);
+    lcd.setCursor(12, 1);
     lcd.print(porcentaje);
-    lcd.setCursor(15,1);
+    lcd.setCursor(15, 1);
     lcd.print("%");
   }
-  else{
+  else
+  {
     lcd.clear();
     lcd.setCursor(8, 0);
     lcd.print("L/min");
-    lcd.setCursor(0,0);
+    lcd.setCursor(0, 0);
     lcd.print(l_hour);
-    lcd.setCursor(0,1);
+    lcd.setCursor(0, 1);
     lcd.print(Liters);
-    lcd.setCursor(8,1);
+    lcd.setCursor(8, 1);
     lcd.print("L");
   }
 
-  //delay(1000);
+  // delay(1000);
 
   // Runs all Blynk stuff
-  Blynk.run(); 
-  
+  Blynk.run();
+
   // runs BlynkTimer
   timer.run();
 }
-
-
