@@ -226,4 +226,10 @@ Autonomous University of the State of Hidalgo (UAEH)
 
 ## License
 
-This project is released under the MIT License.
+Copyright (c) 2026 Alejandro Monroy Avelino
+
+Permission is granted to use, copy, modify, and distribute this software for academic, educational, and research purposes, provided that proper attribution is given to the author.
+
+Commercial use, sublicensing, incorporation into commercial products, or distribution for profit is prohibited without prior written permission from the author.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
