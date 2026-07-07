@@ -157,25 +157,6 @@ Configure the following virtual pins:
 
 ---
 
-## Repository Structure
-
-```text
-.
-├── current_version/
-│   └── firmware_v0.6.9
-├── legacy_versions/
-│   ├── v0.1.0
-│   ├── v0.1.2
-│   ├── ...
-│   └── v0.5.6
-├── hardware/
-├── images/
-├── documentation/
-└── README.md
-```
-
----
-
 ## Version History
 
 The complete development history is available in the `legacy_versions` directory.
