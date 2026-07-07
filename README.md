@@ -1,4 +1,11 @@
-#  Low-Cost IoT System Development for Real-Time Residential
+# A Low-Cost IoT System Development for Real-Time Residential
+
+Authors: Andrea Fernández-Saldaña, Alejandro Monroy-Avelino, Pedro Miranda-Romagnoli, Roberto Noriega-Papaqui
+
+* All authors belong to the Autonomous University of the State of Hidalgo (UAEH)
+
+ID XXXXXX
+
 Water Monitoring
 
 An ESP32-based IoT monitoring system designed for real-time measurement of water tank level and water consumption. The system uses differential pressure sensors to estimate water depth and a pulse-based flow sensor to track water usage. Measurements can be monitored locally through an LCD display and remotely using the Blynk IoT platform.
