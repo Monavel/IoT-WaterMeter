@@ -234,7 +234,7 @@ Autonomous University of the State of Hidalgo (UAEH)
 
 ## License
 
-Copyright (c) 2026 Alejandro Monroy Avelino
+Copyright (c) 2026
 
 Permission is granted to use, copy, modify, and distribute this software for academic, educational, and research purposes, provided that proper attribution is given to the author.
 
