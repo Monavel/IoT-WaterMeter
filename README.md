@@ -1,6 +1,6 @@
 # A Low-Cost IoT System Development for Real-Time Residential
 
-Authors: Andrea Fernández-Saldaña, Alejandro Monroy-Avelino, Pedro Miranda-Romagnoli, Roberto Noriega-Papaqui
+Authors: Andrea M. Fernández-Saldaña, Alejandro Monroy-Avelino, Pedro Miranda-Romagnoli, Roberto Noriega-Papaqui
 
 * All authors belong to the Autonomous University of the State of Hidalgo (UAEH)
 
