@@ -1,4 +1,4 @@
-# A Low-Cost IoT System Development for Real-Time Residential
+# A Low-Cost IoT System Development for Real-Time Residential Water Monitoring
 
 Authors: Andrea M. Fernández-Saldaña, Alejandro Monroy-Avelino, Pedro Miranda-Romagnoli, Roberto Noriega-Papaqui
 
