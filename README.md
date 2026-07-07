@@ -6,6 +6,8 @@ Authors: Andrea M. Fernández-Saldaña, Alejandro Monroy-Avelino, Pedro Miranda-
 
 ID XXXXXX
 
+![Monitoring system](Images/v-abstract.png)
+
 An ESP32-based IoT monitoring system designed for real-time measurement of water tank level and water consumption. The system uses differential pressure sensors to estimate water depth and a pulse-based flow sensor to track water usage. Measurements can be monitored locally through an LCD display and remotely using the Blynk IoT platform.
 
 ---
